@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "snap-here",
+    "name": "Snap Here",
     "slug": "snap-here",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,11 +17,17 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#fab578"
+      },
+      "package": "com.scanner.snaphere"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "43224831-6f3f-4d67-be9d-2da9c9e733aa"
+      }
     }
   }
 }
