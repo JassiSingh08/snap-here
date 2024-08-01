@@ -4,12 +4,15 @@ import { Feather } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
+import { FontAwesome } from '@expo/vector-icons';
 
 const ActionButton = ({ onPress, Color = ["#192f6a"], work, textStyle }) => {
   const getButtonText = (work) => {
     switch (work) {
       case "copy":
         return <Feather name="copy" size={24} color="white" />;
+      case "paste":
+        return <FontAwesome name="paste" size={24} color="white" />
       case "clear":
         return <FontAwesome5 name="eraser" size={24} color="white" />;
       case "export":

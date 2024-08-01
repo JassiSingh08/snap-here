@@ -25,6 +25,7 @@ const CodeWrapper = ({
   isCodeSnippet,
   fileHeading,
   enterFileHeading,
+  fonts,
 }) => {
   return (
     <LinearGradient
@@ -96,6 +97,7 @@ const CodeWrapper = ({
             hljsStyle={!theme ? atomOneDarkReasonable : theme}
             textStyle={{
               fontSize: fontSize,
+              fontFamily: fonts ? "Consolas" : "",
             }}
             language="typescript"
             scrollViewProps={{
@@ -117,7 +119,6 @@ const CodeWrapper = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 5,
     justifyContent: "center",
   },
   colorOptions: {

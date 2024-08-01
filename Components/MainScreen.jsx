@@ -1,11 +1,13 @@
 import {
   Alert,
   BackHandler,
+  Dimensions,
   Keyboard,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -16,11 +18,16 @@ import BottomSheets from "./BottomSheet.";
 import ActionButton from "./ActionButton";
 import { atomOneDarkReasonable } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import * as MediaLibrary from "expo-media-library";
-import { placeholderText, showToast } from "./lib/constants";
+import { placeholderText, showToast, errorText } from "./lib/constants";
 import Settings from "./Settings";
 import { Header as HeaderRNE } from "@rneui/themed";
 import * as Clipboard from "expo-clipboard";
-import { useFonts } from "expo-font";
+import * as Linking from "expo-linking";
+import ToggleSwitch from "./ToggleSwitch ";
+import { Icon } from "@rneui/base";
+import ExModal from "./ExModal";
+import Xapp from "./SVG/Xapp";
+const width = Dimensions.get("screen").width;
 
 let colorScheme;
 
@@ -42,12 +49,23 @@ export default function MainScreen({
   const [enterFileHeading, setEnterFileHeading] = useState(false);
   const [fileHeading, setfileHeading] = useState("");
   const [backPressedCount, setBackPressedCount] = useState(0);
+  const [isDrafts, setDrafts] = useState(false);
+  const [isModal, setModal] = useState(false);
+  const [placeholder, setPlaceholder] = useState(placeholderText);
 
   const handleSnapPress = useCallback(() => {
-    setShowHelperBtns(false);
-    Keyboard.dismiss();
-    bottomSheetRef.current?.snapToIndex(1);
-  }, []);
+    // if (isDrafts) {
+    //   // Add your logic here for handling drafts
+    // }
+    if (codeSnippet.trim() !== "") {
+      setShowHelperBtns(false);
+      Keyboard.dismiss();
+      setPlaceholder(placeholderText);
+      bottomSheetRef.current?.snapToIndex(1);
+    } else {
+      setPlaceholder(errorText);
+    }
+  }, [isDrafts, codeSnippet, errorText]);
 
   const handleSheetChange = useCallback((index) => {
     setShowHelperBtns(index === -1);
@@ -99,6 +117,15 @@ export default function MainScreen({
     }
   };
 
+  const pasteFromClipboard = async () => {
+    try {
+      const content = await Clipboard.getStringAsync();
+      setCodeSnippet(content);
+    } catch (error) {
+      alert("Failed to read clipboard content");
+    }
+  };
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -128,34 +155,88 @@ export default function MainScreen({
     };
   }, [backPressedCount]);
 
+  const openTwitter = async (message) => {
+    const url = `twitter://post?message=${encodeURIComponent(message)}`;
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${url}`);
+    }
+  };
+  const onModalClose = () => {
+    setModal(false);
+  };
+
   return (
     <>
       <HeaderRNE
         elevated={true}
         placement="left"
         centerComponent={{
-          text: "Snap Here",
+          text: isDrafts ? "Drafts Here" : "Snap Here",
           style: [styles.heading, fonts ? { fontFamily: "RobotoMono" } : {}],
         }}
+        // rightComponent={
+        //   <View style={styles.headerRight}>
+        //     <TouchableOpacity
+        //       onPress={() => {
+        //         console.log("first");
+        //       }}
+        //     >
+        //       <Icon name="menu" color="white" />
+        //     </TouchableOpacity>
+        //   </View>
+        // }
         backgroundColor={bgColor[0]}
       />
+      {/* <ToggleSwitch
+        label="Drafts Mode"
+        isEnabled={isDrafts}
+        toggleSwitch={() => {
+          setDrafts(!isDrafts);
+          setPlaceholder(placeholderText);
+        }}
+        bgColor={bgColor}
+      /> */}
       <SafeAreaView style={styles.container}>
         <ScrollView
           horizontal
           contentContainerStyle={styles.colorOptions}
           showsHorizontalScrollIndicator={false}
         >
-          <ViewShot ref={viewShotRef}>
-            <CodeWrapper
-              code={codeSnippet}
-              backgroundColor={bgColor}
-              fontSize={textSize}
-              theme={theme}
-              isCodeSnippet={isCodeSnippet}
-              fileHeading={fileHeading}
-              enterFileHeading={enterFileHeading}
-            />
-          </ViewShot>
+          {isDrafts ? (
+            <View>
+              <Text
+                style={{
+                  minWidth: width - 80,
+                  minHeight: 120,
+                  padding: 10,
+                  borderRadius: 10,
+                  backgroundColor: theme.hljs.background,
+                  color: theme.hljs.color,
+                }}
+              >
+                {codeSnippet}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <ViewShot ref={viewShotRef}>
+                <CodeWrapper
+                  code={codeSnippet}
+                  backgroundColor={bgColor}
+                  fontSize={textSize}
+                  theme={theme}
+                  isCodeSnippet={isCodeSnippet}
+                  fileHeading={fileHeading}
+                  enterFileHeading={enterFileHeading}
+                  fonts={fonts}
+                />
+              </ViewShot>
+            </>
+          )}
         </ScrollView>
       </SafeAreaView>
 
@@ -164,7 +245,7 @@ export default function MainScreen({
           style={[styles.textArea, fonts ? { fontFamily: "RobotoMono" } : {}]}
           value={codeSnippet}
           onChangeText={setCodeSnippet}
-          placeholder={placeholderText}
+          placeholder={placeholder}
           maxLength={1000}
           lineLength={50}
           autoFocus={showHelperBtns}
@@ -186,6 +267,7 @@ export default function MainScreen({
               isCodeSnippet={isCodeSnippet}
               fileHeading={fileHeading}
               enterFileHeading={enterFileHeading}
+              fonts={fonts}
             />
           </ViewShot>
         </ScrollView>
@@ -211,7 +293,15 @@ export default function MainScreen({
           <>
             <ActionButton onPress={handleCopy} Color={bgColor} work="copy" />
             <ActionButton
-              onPress={() => setCodeSnippet("")}
+              onPress={pasteFromClipboard}
+              Color={bgColor}
+              work="paste"
+            />
+            <ActionButton
+              onPress={() => {
+                setCodeSnippet("");
+                setPlaceholder(placeholderText);
+              }}
               Color={bgColor}
               work="clear"
             />
@@ -226,6 +316,11 @@ export default function MainScreen({
           <ActionButton onPress={captureView} Color={bgColor} work="download" />
         )}
       </View>
+      <ExModal isVisible={isModal} onClose={onModalClose} Color={bgColor}>
+        <View style={{ height: 65, width: 65, marginLeft: 20, marginTop: 40 }}>
+          <Xapp />
+        </View>
+      </ExModal>
     </>
   );
 }
@@ -235,6 +330,12 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
     paddingVertical: 10,
+  },
+  headerRight: {
+    display: "flex",
+    flexDirection: "row",
+    paddingVertical: 12,
+    marginHorizontal: 20,
   },
   container: {
     flex: 1,
@@ -291,14 +392,14 @@ const styles = StyleSheet.create({
     // backgroundColor: "black",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 40,
   },
   buttonContainer: {
     gap: 10,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
-    position: "absolute",
-    bottom: "2%",
-    right: "3%",
+    bottom: "4%",
   },
 });

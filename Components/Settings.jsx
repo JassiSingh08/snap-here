@@ -25,7 +25,7 @@ export default function Settings({
   const [isBackground, setBackground] = useState(false);
   const [isSize, setSize] = useState(false);
   const [isTheme, setisTheme] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Atom OneDark Reasonable");
+  const [placeholder, setPlaceholder] = useState("A11Y Dark");
 
   return (
     <>

@@ -296,6 +296,5 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
     borderRadius: 10,
-    color: "#fff",
   },
 });

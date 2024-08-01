@@ -19,6 +19,13 @@ const placeholderText = `
   Or not. Whatever.
 `;
 
+const errorText = `
+  HEY I'M EMPTY!!
+`;
+// const errorText = `
+//   DRAFTS IS EMPTY!!
+// `;
+
 const showToast = (type, Text1, Text2, duration = 4000) => {
     Toast.show({
         type: type,
@@ -34,5 +41,6 @@ const showToast = (type, Text1, Text2, duration = 4000) => {
 export {
     colors,
     placeholderText,
+    errorText,
     showToast
 }

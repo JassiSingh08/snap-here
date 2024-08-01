@@ -10,6 +10,7 @@ const App = () => {
   const [bgColor, setBgColor] = useState(["#4c669f", "#3b5998", "#192f6a"]);
   let [fontsLoaded] = useFonts({
     RobotoMono: require("./assets/Fonts/RobotoMono-VariableFont_wght.ttf"),
+    Consolas: require("./assets/Fonts/Consolas.ttf"),
   });
 
   const colorScheme = useColorScheme();
