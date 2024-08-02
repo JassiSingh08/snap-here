@@ -4,7 +4,6 @@ import {
   Dimensions,
   Keyboard,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -27,6 +26,7 @@ import ToggleSwitch from "./ToggleSwitch ";
 import { Icon } from "@rneui/base";
 import ExModal from "./ExModal";
 import Xapp from "./SVG/Xapp";
+import { ScrollView } from "react-native-gesture-handler";
 const width = Dimensions.get("screen").width;
 
 let colorScheme;
